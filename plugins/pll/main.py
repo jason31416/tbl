@@ -38,11 +38,11 @@ elif args[0] in ["install", "is"]:
         tbl_print(f"&1mPlugin exists!")
     else:
         tbl_print(f"&3mDownloading files...")
-        if ct[:4] == "git:":
+        if args[1][:4] == "git:":
             ct = requests.get(
                 "https://raw.githubusercontent.com/" + args[1]).content.decode(
                 "utf-8")
-        elif ct[:4] == "web:":
+        elif args[1][:4] == "web:":
             ct = requests.get(args[1]).content.decode(
                 "utf-8")
         else:
@@ -68,7 +68,50 @@ elif args[0] in ["install", "is"]:
                 with open(f"plugins/{args[1]}/{curfl}", "w") as fl:
                     fl.write(cur)
             tbl_print(f"&2mSuccessfully installed '{args[1]}'!")
+elif args[0] in ["up", "update"]:
+    if len(args) == 1:
+        tbl_print("&1mMissing argument!")
+    elif os.path.exists("plugins/"+args[1]):
+        tbl_print(f"&1mAre you sure about updating the plugin: {args[1]}(WILL REMOVE ALL DATAS STORED LOCALLY!)")
+        if tbl_input("(y/n):") == "y":
+            for i in os.listdir("plugins/"+args[1]):
+                os.remove("plugins/"+args[1]+"/"+i)
+            os.rmdir("plugins/"+args[1])
+            tbl_print(f"&3mDownloading latest version...")
+            if args[1][:4] == "git:":
+                ct = requests.get(
+                    "https://raw.githubusercontent.com/" + args[1]).content.decode(
+                    "utf-8")
+            elif args[1][:4] == "web:":
+                ct = requests.get(args[1]).content.decode(
+                    "utf-8")
+            else:
+                ct = requests.get(
+                    "https://raw.githubusercontent.com/jason31416/tbl_plugins/main/" + args[1] + ".par").content.decode(
+                    "utf-8")
 
+            if ct == "404: Not Found":
+                tbl_print(f"&1mPlugin doesn't exist!")
+            else:
+                tbl_print(f"&3mInstalling package...")
+                os.mkdir("plugins/" + args[1])
+                cur = ""
+                curfl = ""
+                for i in ct.split("\n"):
+                    if i[:8] == "<--File:":
+                        if curfl != "":
+                            with open(f"plugins/{args[1]}/{curfl}", "w") as fl:
+                                fl.write(cur)
+                        curfl = i[8:]
+                        cur = ""
+                    else:
+                        cur += i + "\n"
+                if curfl != "":
+                    with open(f"plugins/{args[1]}/{curfl}", "w") as fl:
+                        fl.write(cur)
+                tbl_print(f"&2mSuccessfully updated '{args[1]}'!")
+    else:
+        tbl_print(f"&1mPlugin '{args[1]}' doesn't exist! Use pll install instead!")
 else:
     tbl_print("&1mUnknown command&7m!")
 
