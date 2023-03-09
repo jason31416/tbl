@@ -1,0 +1,7 @@
+fl is the file system.
+sub-commands:
+- fl nw <filename>: new file
+- fl cd <dir>: move to the dir
+- fl set <file> <content(use '\\n for newlines')>: set a file's content to a certain value
+- fl get <file>: get the file content and store it into &7[res]
+- fl rm <file>: remove a file

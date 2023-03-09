@@ -1,0 +1,2 @@
+this command allows you to say something to the console.
+For example, enter:&2m"say hi"&9mto output &3m"hi"&9m to the console
