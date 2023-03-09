@@ -71,13 +71,13 @@ while True:
         tbl_print(f"&1mInternal server error occored: Unknown return code: &2m{ret}&7m!")
         exit(0)
 
-tbl_print("&3mLoading plugins...")
-
-pl = {}
-
 def read_file(fl):
     with open(fl) as fll:
         return fll.read()
+
+tbl_print("&3mLoading plugins...")
+
+pl = {}
 
 for i in os.listdir("plugins"):
     if os.path.isdir("plugins/"+i):
@@ -114,8 +114,35 @@ while True:
             tbl_print(f"&7m- &3m{i}:")
             for j in pl[i].hp:
                 tbl_print("  "+j)
-    elif inp[0] in ["exit", "quit"]:
+        tbl_print("&3mexit/quit/stop to quit")
+        tbl_print("&3mreload to reload all plugins")
+    elif inp[0] in ["exit", "quit", "stop"]:
         tbl_print(f"&4mBye!")
         exit(0)
+    elif inp[0] == "reload":
+        tbl_print("&3mLoading plugins...")
+
+        pl = {}
+        dt = {}
+
+        for i in os.listdir("plugins"):
+            if os.path.isdir("plugins/" + i):
+                if os.path.exists("plugins/" + i + "/main.py"):
+                    if os.path.exists("plugins/" + i + "/init.py"):
+                        pl[i] = plugin(read_file("plugins/" + i + "/main.py"), read_file("plugins/" + i + "/init.py"))
+                    else:
+                        pl[i] = plugin(read_file("plugins/" + i + "/main.py"), "")
+                    if os.path.exists("plugins/" + i + "/help.txt"):
+                        pl[i].hp = read_file("plugins/" + i + "/help.txt").split("\n")
+
+        for i in pl:
+            try:
+                exec(pl[i].ini, globals(),
+                     {"setdt": setdt, "getdt": getdt, "run_command": runcmd, "user": usr, "getremotedt": utlogin.getdt,
+                      "setremotedt": utlogin.setdt})
+            except Exception as e:
+                tbl_print(f"&1mError:\n{e}")
+
+        tbl_print("&3mPlugins loaded!")
     else:
         tbl_print(f"&1mError: Unknown command &3m{inp[0]}&1m!")
